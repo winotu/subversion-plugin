@@ -1705,4 +1705,9 @@ public class SubversionSCMTest extends AbstractSubversionTest {
         // should detect change
         assertTrue(p.poll(StreamTaskListener.fromStdout()).hasChanges());
     }
+
+    @Bug(6415)
+    public testFailingOnExternalsProblem() throws Exception {
+
+    }
 }    
