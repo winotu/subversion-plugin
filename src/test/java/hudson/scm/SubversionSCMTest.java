@@ -1707,7 +1707,24 @@ public class SubversionSCMTest extends AbstractSubversionTest {
     }
 
     @Bug(6415)
-    public testFailingOnExternalsProblem() throws Exception {
+    public void testFailingOnExternalsProblem() throws Exception {
+        File repo = new CopyExisting(getClass().getResource("JENKINS-6415.zip")).allocate();
+        String path = "file://" + repo.toURI().toURL().getPath();
 
+        // first checkout
+        FreeStyleProject p = createFreeStyleProject();
+
+        ModuleLocation[] locations = {
+                new ModuleLocation(path + "/JENKINS-6415/test", ".", "infinity", true),
+        };
+
+        p.setScm(new SubversionSCM(Arrays.asList(locations), new CheckoutUpdater(), null, null, null, null, null, null));
+
+        FreeStyleBuild build = assertBuildStatusSuccess(p.scheduleBuild2(0));
+        FilePath ws = build.getWorkspace();
+
+        // Check that the external exists
+        assertTrue(ws.child(".").child("thefile.txt").exists());
+        assertTrue(!ws.child(".").child("brk_ext").exists());
     }
-}    
+}
